@@ -18,7 +18,7 @@ DEFINE_STACK_OF(ESS_CERT_ID_V2)
 DEFINE_STACK_OF(X509)
 DEFINE_STACK_OF(GENERAL_NAME)
 
-static int ess_issuer_serial_cmp(ESS_ISSUER_SERIAL *is, X509 *cert);
+static int ess_issuer_serial_cmp(const ESS_ISSUER_SERIAL *is, const X509 *cert);
 
 static ESS_CERT_ID *ESS_CERT_ID_new_init(X509 *cert, int issuer_needed);
 static ESS_CERT_ID_V2 *ESS_CERT_ID_V2_new_init(const EVP_MD *hash_alg,
@@ -87,8 +87,8 @@ static ESS_CERT_ID *ESS_CERT_ID_new_init(X509 *cert, int issuer_needed)
         goto err;
     name = NULL;            /* Ownership is lost. */
     ASN1_INTEGER_free(cid->issuer_serial->serial);
-    if (!(cid->issuer_serial->serial =
-          ASN1_INTEGER_dup(X509_get_serialNumber(cert))))
+    if ((cid->issuer_serial->serial =
+          ASN1_INTEGER_dup(X509_get_serialNumber(cert))) == NULL)
         goto err;
 
     return cid;
@@ -198,8 +198,9 @@ ESS_SIGNING_CERT *ESS_SIGNING_CERT_get(PKCS7_SIGNER_INFO *si)
 {
     ASN1_TYPE *attr;
     const unsigned char *p;
+
     attr = PKCS7_get_signed_attribute(si, NID_id_smime_aa_signingCertificate);
-    if (!attr)
+    if (attr == NULL)
         return NULL;
     p = attr->value.sequence->data;
     return d2i_ESS_SIGNING_CERT(NULL, &p, attr->value.sequence->length);
@@ -277,12 +278,12 @@ int ESS_SIGNING_CERT_V2_add(PKCS7_SIGNER_INFO *si,
 }
 
 /* Returns < 0 if certificate is not found, certificate index otherwise. */
-int ess_find_cert(STACK_OF(ESS_CERT_ID) *cert_ids, X509 *cert)
+int ess_find_cert(const STACK_OF(ESS_CERT_ID) *cert_ids, X509 *cert)
 {
     int i;
     unsigned char cert_sha1[SHA_DIGEST_LENGTH];
 
-    if (!cert_ids || !cert)
+    if (cert_ids == NULL || cert == NULL)
         return -1;
 
     /* Recompute SHA1 hash of certificate if necessary (side effect). */
@@ -293,11 +294,11 @@ int ess_find_cert(STACK_OF(ESS_CERT_ID) *cert_ids, X509 *cert)
 
     /* Look for cert in the cert_ids vector. */
     for (i = 0; i < sk_ESS_CERT_ID_num(cert_ids); ++i) {
-        ESS_CERT_ID *cid = sk_ESS_CERT_ID_value(cert_ids, i);
+        const ESS_CERT_ID *cid = sk_ESS_CERT_ID_value(cert_ids, i);
 
         if (cid->hash->length == SHA_DIGEST_LENGTH
             && memcmp(cid->hash->data, cert_sha1, SHA_DIGEST_LENGTH) == 0) {
-            ESS_ISSUER_SERIAL *is = cid->issuer_serial;
+            const ESS_ISSUER_SERIAL *is = cid->issuer_serial;
 
             if (is == NULL || ess_issuer_serial_cmp(is, cert) == 0)
                 return i;
@@ -308,7 +309,7 @@ int ess_find_cert(STACK_OF(ESS_CERT_ID) *cert_ids, X509 *cert)
 }
 
 /* Returns < 0 if certificate is not found, certificate index otherwise. */
-int ess_find_cert_v2(STACK_OF(ESS_CERT_ID_V2) *cert_ids, X509 *cert)
+int ess_find_cert_v2(const STACK_OF(ESS_CERT_ID_V2) *cert_ids, const X509 *cert)
 {
     int i;
     unsigned char cert_digest[EVP_MAX_MD_SIZE];
@@ -316,7 +317,7 @@ int ess_find_cert_v2(STACK_OF(ESS_CERT_ID_V2) *cert_ids, X509 *cert)
 
     /* Look for cert in the cert_ids vector. */
     for (i = 0; i < sk_ESS_CERT_ID_V2_num(cert_ids); ++i) {
-        ESS_CERT_ID_V2 *cid = sk_ESS_CERT_ID_V2_value(cert_ids, i);
+        const ESS_CERT_ID_V2 *cid = sk_ESS_CERT_ID_V2_value(cert_ids, i);
         const EVP_MD *md;
 
         if (cid != NULL && cid->hash_alg != NULL)
@@ -331,7 +332,7 @@ int ess_find_cert_v2(STACK_OF(ESS_CERT_ID_V2) *cert_ids, X509 *cert)
             return -1;
 
         if (memcmp(cid->hash->data, cert_digest, cid->hash->length) == 0) {
-            ESS_ISSUER_SERIAL *is = cid->issuer_serial;
+            const ESS_ISSUER_SERIAL *is = cid->issuer_serial;
 
             if (is == NULL || ess_issuer_serial_cmp(is, cert) == 0)
                 return i;
@@ -341,11 +342,11 @@ int ess_find_cert_v2(STACK_OF(ESS_CERT_ID_V2) *cert_ids, X509 *cert)
     return -1;
 }
 
-static int ess_issuer_serial_cmp(ESS_ISSUER_SERIAL *is, X509 *cert)
+static int ess_issuer_serial_cmp(const ESS_ISSUER_SERIAL *is, const X509 *cert)
 {
     GENERAL_NAME *issuer;
 
-    if (!is || !cert || sk_GENERAL_NAME_num(is->issuer) != 1)
+    if (is == NULL || cert == NULL || sk_GENERAL_NAME_num(is->issuer) != 1)
         return -1;
 
     issuer = sk_GENERAL_NAME_value(is->issuer, 0);
@@ -353,7 +354,7 @@ static int ess_issuer_serial_cmp(ESS_ISSUER_SERIAL *is, X509 *cert)
         || X509_NAME_cmp(issuer->d.dirn, X509_get_issuer_name(cert)) != 0)
         return -1;
 
-    if (ASN1_INTEGER_cmp(is->serial, X509_get_serialNumber(cert)) != 0)
+    if (ASN1_INTEGER_cmp(is->serial, X509_get_serialNumber((X509 *)cert)) != 0)
         return -1;
 
     return 0;
