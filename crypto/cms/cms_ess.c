@@ -32,20 +32,19 @@ IMPLEMENT_ASN1_FUNCTIONS(CMS_ReceiptRequest)
 int CMS_get1_ReceiptRequest(CMS_SignerInfo *si, CMS_ReceiptRequest **prr)
 {
     ASN1_STRING *str;
-    CMS_ReceiptRequest *rr = NULL;
-    if (prr)
+    CMS_ReceiptRequest *rr;
+    ASN1_OBJECT *obj = OBJ_nid2obj(NID_id_smime_aa_receiptRequest);
+
+    if (prr != NULL)
         *prr = NULL;
-    str = CMS_signed_get0_data_by_OBJ(si,
-                                      OBJ_nid2obj
-                                      (NID_id_smime_aa_receiptRequest), -3,
-                                      V_ASN1_SEQUENCE);
-    if (!str)
+    str = CMS_signed_get0_data_by_OBJ(si, obj, -3, V_ASN1_SEQUENCE);
+    if (str == NULL)
         return 0;
 
     rr = ASN1_item_unpack(str, ASN1_ITEM_rptr(CMS_ReceiptRequest));
-    if (!rr)
+    if (rr == NULL)
         return -1;
-    if (prr)
+    if (prr != NULL)
         *prr = rr;
     else
         CMS_ReceiptRequest_free(rr);
@@ -61,20 +60,19 @@ int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
                                        ESS_SIGNING_CERT_V2 **psc)
 {
     ASN1_STRING *str;
-    ESS_SIGNING_CERT_V2 *sc = NULL;
+    ESS_SIGNING_CERT_V2 *sc;
     ASN1_OBJECT *obj = OBJ_nid2obj(NID_id_smime_aa_signingCertificateV2);
 
-    if (psc)
+    if (psc != NULL)
         *psc = NULL;
-
     str = CMS_signed_get0_data_by_OBJ(si, obj, -3, V_ASN1_SEQUENCE);
     if (str == NULL)
         return 0;
 
     sc = ASN1_item_unpack(str, ASN1_ITEM_rptr(ESS_SIGNING_CERT_V2));
-    if (!sc)
+    if (sc == NULL)
         return -1;
-    if (psc)
+    if (psc != NULL)
         *psc = sc;
     else
         ESS_SIGNING_CERT_V2_free(sc);
@@ -93,16 +91,16 @@ int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
     ESS_SIGNING_CERT *sc;
     ASN1_OBJECT *obj = OBJ_nid2obj(NID_id_smime_aa_signingCertificate);
 
-    if (psc)
+    if (psc != NULL)
         *psc = NULL;
     str = CMS_signed_get0_data_by_OBJ(si, obj, -3, V_ASN1_SEQUENCE);
     if (str == NULL)
         return 0;
 
     sc = ASN1_item_unpack(str, ASN1_ITEM_rptr(ESS_SIGNING_CERT));
-    if (!sc)
+    if (sc == NULL)
         return -1;
-    if (psc)
+    if (psc != NULL)
         *psc = sc;
     else
         ESS_SIGNING_CERT_free(sc);
@@ -114,8 +112,7 @@ int ess_check_signing_certs(CMS_SignerInfo *si, STACK_OF(X509) *chain)
     ESS_SIGNING_CERT *ss = NULL;
     ESS_SIGNING_CERT_V2 *ssv2 = NULL;
     X509 *cert;
-    int i = 0;
-    int ret = 0;
+    int i = 0, ret = 0;
 
     if (cms_signerinfo_get_signing_cert(si, &ss) > 0) {
         STACK_OF(ESS_CERT_ID) *cert_ids = ss->cert_ids;
@@ -175,7 +172,7 @@ CMS_ReceiptRequest *CMS_ReceiptRequest_create0(unsigned char *id, int idlen,
                                                *receiptList, STACK_OF(GENERAL_NAMES)
                                                *receiptsTo)
 {
-    CMS_ReceiptRequest *rr = NULL;
+    CMS_ReceiptRequest *rr;
 
     rr = CMS_ReceiptRequest_new();
     if (rr == NULL)
@@ -265,6 +262,7 @@ static int cms_msgSigDigest(CMS_SignerInfo *si,
                             unsigned char *dig, unsigned int *diglen)
 {
     const EVP_MD *md;
+
     md = EVP_get_digestbyobj(si->digestAlgorithm->algorithm);
     if (md == NULL)
         return 0;
@@ -280,6 +278,7 @@ int cms_msgSigDigest_add1(CMS_SignerInfo *dest, CMS_SignerInfo *src)
 {
     unsigned char dig[EVP_MAX_MD_SIZE];
     unsigned int diglen;
+
     if (!cms_msgSigDigest(src, dig, &diglen)) {
         CMSerr(CMS_F_CMS_MSGSIGDIGEST_ADD1, CMS_R_MSGSIGDIGEST_ERROR);
         return 0;
