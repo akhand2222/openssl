@@ -52,6 +52,8 @@ static const ERR_STRING_DATA CMS_str_reasons[] = {
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_ERROR_SETTING_KEY), "error setting key"},
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_ERROR_SETTING_RECIPIENTINFO),
     "error setting recipientinfo"},
+    {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_ESS_SIGNING_CERTIFICATE_ERROR),
+    "ess signing certificate error"},
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_INVALID_ENCRYPTED_KEY_LENGTH),
     "invalid encrypted key length"},
     {ERR_PACK(ERR_LIB_CMS, 0, CMS_R_INVALID_KEY_ENCRYPTION_PARAMETER),
