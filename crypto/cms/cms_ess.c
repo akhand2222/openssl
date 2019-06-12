@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2019 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2008-2020 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -47,6 +47,113 @@ int CMS_get1_ReceiptRequest(CMS_SignerInfo *si, CMS_ReceiptRequest **prr)
     else
         CMS_ReceiptRequest_free(rr);
     return 1;
+}
+
+int CMS_SignerInfo_get_signing_cert_v2(CMS_SignerInfo *si,
+                                       ESS_SIGNING_CERT_V2 **psc)
+{
+    ASN1_STRING *str;
+    ESS_SIGNING_CERT_V2 *sc = NULL;
+    ASN1_OBJECT *obj = OBJ_nid2obj(NID_id_smime_aa_signingCertificateV2);
+
+    if (psc)
+        *psc = NULL;
+
+    str = CMS_signed_get0_data_by_OBJ(si, obj, -3, V_ASN1_SEQUENCE);
+    if (str == NULL)
+        return 0;
+
+    sc = ASN1_item_unpack(str, ASN1_ITEM_rptr(ESS_SIGNING_CERT_V2));
+    if (!sc)
+        return -1;
+    if (psc)
+        *psc = sc;
+    else
+        ESS_SIGNING_CERT_V2_free(sc);
+    return 1;
+}
+
+int CMS_SignerInfo_get_signing_cert(CMS_SignerInfo *si,
+                                    ESS_SIGNING_CERT **psc)
+{
+    ASN1_STRING *str;
+    ESS_SIGNING_CERT *sc;
+    ASN1_OBJECT *obj = OBJ_nid2obj(NID_id_smime_aa_signingCertificate);
+
+    if (psc)
+        *psc = NULL;
+    str = CMS_signed_get0_data_by_OBJ(si, obj, -3, V_ASN1_SEQUENCE);
+    if (str == NULL)
+        return 0;
+
+    sc = ASN1_item_unpack(str, ASN1_ITEM_rptr(ESS_SIGNING_CERT));
+    if (!sc)
+        return -1;
+    if (psc)
+        *psc = sc;
+    else
+        ESS_SIGNING_CERT_free(sc);
+    return 1;
+}
+
+int ess_check_signing_certs(CMS_SignerInfo *si, STACK_OF(X509) *chain)
+{
+    ESS_SIGNING_CERT *ss = NULL;
+    ESS_SIGNING_CERT_V2 *ssv2 = NULL;
+    X509 *cert;
+    int i = 0;
+    int ret = 0;
+
+    if (CMS_SignerInfo_get_signing_cert(si, &ss) > 0) {
+        STACK_OF(ESS_CERT_ID) *cert_ids = ss->cert_ids;
+
+        cert = sk_X509_value(chain, 0);
+        if (ess_find_cert(cert_ids, cert) != 0)
+            goto err;
+
+        /*
+         * Check the other certificates of the chain.
+         * Fail if no signing certificate ids found for each certificate.
+         */
+        if (sk_ESS_CERT_ID_num(cert_ids) > 1) {
+            /* for each chain cert, try to find its cert id */
+            for (i = 1; i < sk_X509_num(chain); ++i) {
+                cert = sk_X509_value(chain, i);
+                if (ess_find_cert(cert_ids, cert) < 0)
+                    goto err;
+            }
+        }
+    } else if (CMS_SignerInfo_get_signing_cert_v2(si, &ssv2) > 0) {
+        STACK_OF(ESS_CERT_ID_V2) *cert_ids_v2 = ssv2->cert_ids;
+
+        cert = sk_X509_value(chain, 0);
+        if (ess_find_cert_v2(cert_ids_v2, cert) != 0)
+            goto err;
+
+        /*
+         * Check the other certificates of the chain.
+         * Fail if no signing certificate ids found for each certificate.
+         */
+        if (sk_ESS_CERT_ID_V2_num(cert_ids_v2) > 1) {
+            /* for each chain cert, try to find its cert id */
+            for (i = 1; i < sk_X509_num(chain); ++i) {
+                cert = sk_X509_value(chain, i);
+                if (ess_find_cert_v2(cert_ids_v2, cert) < 0)
+                    goto err;
+            }
+        }
+    } else {
+        goto err;
+    }
+
+    ret = 1;
+ err:
+    if (!ret)
+        CMSerr(CMS_F_ESS_CHECK_SIGNING_CERTS,
+               CMS_R_ESS_SIGNING_CERTIFICATE_ERROR);
+    ESS_SIGNING_CERT_free(ss);
+    ESS_SIGNING_CERT_V2_free(ssv2);
+    return ret;
 }
 
 CMS_ReceiptRequest *CMS_ReceiptRequest_create0(unsigned char *id, int idlen,
