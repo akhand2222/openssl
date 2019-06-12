@@ -22,6 +22,15 @@
 DEFINE_STACK_OF(GENERAL_NAMES)
 DEFINE_STACK_OF(CMS_SignerInfo)
 
+/*
+ * Returns < 0 if attribute is not found, 1 if found, or 
+ * -1 on attribute parsing failure.
+ */
+int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
+                                       ESS_SIGNING_CERT_V2 **psc);
+int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
+                                    ESS_SIGNING_CERT **psc);
+
 IMPLEMENT_ASN1_FUNCTIONS(CMS_ReceiptRequest)
 
 /* ESS services */
@@ -49,7 +58,7 @@ int CMS_get1_ReceiptRequest(CMS_SignerInfo *si, CMS_ReceiptRequest **prr)
     return 1;
 }
 
-int CMS_SignerInfo_get_signing_cert_v2(CMS_SignerInfo *si,
+int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
                                        ESS_SIGNING_CERT_V2 **psc)
 {
     ASN1_STRING *str;
@@ -73,7 +82,7 @@ int CMS_SignerInfo_get_signing_cert_v2(CMS_SignerInfo *si,
     return 1;
 }
 
-int CMS_SignerInfo_get_signing_cert(CMS_SignerInfo *si,
+int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
                                     ESS_SIGNING_CERT **psc)
 {
     ASN1_STRING *str;
@@ -104,7 +113,7 @@ int ess_check_signing_certs(CMS_SignerInfo *si, STACK_OF(X509) *chain)
     int i = 0;
     int ret = 0;
 
-    if (CMS_SignerInfo_get_signing_cert(si, &ss) > 0) {
+    if (cms_signerinfo_get_signing_cert(si, &ss) > 0) {
         STACK_OF(ESS_CERT_ID) *cert_ids = ss->cert_ids;
 
         cert = sk_X509_value(chain, 0);
@@ -123,7 +132,7 @@ int ess_check_signing_certs(CMS_SignerInfo *si, STACK_OF(X509) *chain)
                     goto err;
             }
         }
-    } else if (CMS_SignerInfo_get_signing_cert_v2(si, &ssv2) > 0) {
+    } else if (cms_signerinfo_get_signing_cert_v2(si, &ssv2) > 0) {
         STACK_OF(ESS_CERT_ID_V2) *cert_ids_v2 = ssv2->cert_ids;
 
         cert = sk_X509_value(chain, 0);
