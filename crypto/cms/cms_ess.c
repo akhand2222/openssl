@@ -26,10 +26,10 @@ DEFINE_STACK_OF(CMS_SignerInfo)
  * Returns < 0 if attribute is not found, 1 if found, or 
  * -1 on attribute parsing failure.
  */
-int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
-                                       ESS_SIGNING_CERT_V2 **psc);
-int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
-                                    ESS_SIGNING_CERT **psc);
+static int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
+                                              ESS_SIGNING_CERT_V2 **psc);
+static int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
+                                           ESS_SIGNING_CERT **psc);
 
 IMPLEMENT_ASN1_FUNCTIONS(CMS_ReceiptRequest)
 
@@ -58,8 +58,8 @@ int CMS_get1_ReceiptRequest(CMS_SignerInfo *si, CMS_ReceiptRequest **prr)
     return 1;
 }
 
-int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
-                                       ESS_SIGNING_CERT_V2 **psc)
+static int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
+                                              ESS_SIGNING_CERT_V2 **psc)
 {
     ASN1_STRING *str;
     ESS_SIGNING_CERT_V2 *sc = NULL;
@@ -82,8 +82,8 @@ int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
     return 1;
 }
 
-int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
-                                    ESS_SIGNING_CERT **psc)
+static int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
+                                           ESS_SIGNING_CERT **psc)
 {
     ASN1_STRING *str;
     ESS_SIGNING_CERT *sc;
