@@ -1,3 +1,6 @@
+image:
+  - Visual Studio 2019
+
 platform:
     - x64
     - x86
@@ -5,13 +8,19 @@ platform:
 environment:
     fast_finish: true
     matrix:
-        - VSVER: 14
+        - VSVER: 18
 
 configuration:
     - shared
     - plain
 
 before_build:
+    - ps: >-
+        Install-Module VSSetup -Scope CurrentUser
+    - ps: >-
+        Get-VSSetupInstance -All
+    - ps: >-
+        $env:VCINSTALL_PATH=Get-VSSetupInstance | Select-VSSetupInstance -Require Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -Latest | Select-Object -ExpandProperty InstallationPath
     - ps: >-
         If ($env:Platform -Match "x86") {
             $env:VCVARS_PLATFORM="x86"
@@ -26,8 +35,8 @@ before_build:
         } Else {
             $env:SHARED="no-shared no-makedepend"
         }
-    - ps: $env:VSCOMNTOOLS=(Get-Content ("env:VS" + "$env:VSVER" + "0COMNTOOLS"))
-    - call "%VSCOMNTOOLS%\..\..\VC\vcvarsall.bat" %VCVARS_PLATFORM%
+    - echo VCINSTALL_PATH is "%VCINSTALL_PATH%"
+    - call "%VCINSTALL_PATH%\VC\Auxiliary\Build\vcvarsall.bat" %VCVARS_PLATFORM%
     - mkdir _build
     - cd _build
     - perl ..\Configure %TARGET% %SHARED%
