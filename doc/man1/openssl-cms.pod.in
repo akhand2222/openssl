@@ -577,10 +577,10 @@ An ESS signing-certificate-v2 attribute allows for the use of any digest algorit
 
 The digital signature value computed on the user data and, when present, on the signed attributes.
 
-Note that B<-cades> option applies to the B<-sign> or B<-verify> operations.
-With this option, the B<-verify> operation will also checks that the 
-signing-certificates attribute presence, and its matching with the verification 
-trust chain build during the verification process.
+NOTE that the B<-cades> option applies to the B<-sign> or B<-verify> operations.
+With this option, the B<-verify> operation also checks that the signing-certificates
+attribute is present, and its value matches the verification trust chain built
+during the verification process.
 
 =back
 
