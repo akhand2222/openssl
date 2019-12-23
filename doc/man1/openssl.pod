@@ -954,11 +954,13 @@ keys shorter than 1024 bits.
 Allow verification to succeed even if a I<complete> chain cannot be built to a
 self-signed trust-anchor, provided it is possible to construct a chain to a
 trusted certificate that might not be self-signed.
+This certificate may be self-issued or belong to an intermediate CA.
 
 =item B<-check_ss_sig>
 
-Verify the signature on the self-signed root CA. This is disabled by default
-because it doesn't add any security.
+Verify the signature on the last certificate in a chain,
+which typically is a trusted self-signed root CA certificate.
+This check is disabled by default because it does not add any security.
 
 =item B<-allow_proxy_certs>
 
@@ -967,6 +969,10 @@ Allow the verification of proxy certificates.
 =item B<-trusted_first>
 
 As of OpenSSL 1.1.0 this option is on by default and cannot be disabled.
+
+When constructing the certificate chain, the trusted certificates specified
+via B<-CAfile>, B<-CApath>, B<-CAstore> or B<-trusted> are always used
+before any certificates specified via B<-untrusted>.
 
 =item B<-no_alt_chains>
 
@@ -986,7 +992,8 @@ This option may be used multiple times.
 =item B<-untrusted> I<file>
 
 Parse I<file> as a set of one or more certificates in PEM format.
-All certificates are untrusted certificates that may be used to
+All certificates are untrusted certificates (typically of intermedate CAs)
+that may be used to
 construct a certificate chain from the subject certificate to a trust anchor.
 This option may be used multiple times.
 
