@@ -116,7 +116,6 @@ static int null_callback(int ok, X509_STORE_CTX *e)
  * This does not verify self-signedness but relies on x509v3_cache_extensions()
  * matching issuer and subject names (i.e., the cert being self-issued) and any
  * present authority key identifier matching the subject key identifier, etc.
- * Moreover the key usage (if present) must allow certificate signing - TODO correct this wrong semantics of x509v3_cache_extensions()
  */
 static int apparently_self_signed(X509_STORE_CTX *ctx, X509 *x)
 {
@@ -347,7 +346,7 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
         return ss;
     }
 
-    ret = x509_check_issued_int(issuer, x, ctx->libctx, ctx->propq);
+    ret = X509_likely_issued(issuer, x, ctx->libctx, ctx->propq);
     if (ret == X509_V_OK) {
         int i;
         X509 *ch;
@@ -357,7 +356,7 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
             return 0;
 
         /* Special case: single self-signed certificate */
-        if (ss > 0 && sk_X509_num(ctx->chain) == 1)
+        if (x == issuer && sk_X509_num(ctx->chain) == 1)
             return 1;
         for (i = 0; i < sk_X509_num(ctx->chain); i++) {
             ch = sk_X509_value(ctx->chain, i);
@@ -1768,13 +1767,17 @@ static int internal_verify(X509_STORE_CTX *ctx)
         /*
          * Skip signature check for self-signed certificates unless explicitly
          * asked for because it does not add any security and just wastes time.
-         * If the issuer's public key is unusable, report the issuer certificate
+         * If the issuer's public key is not available or its key usage does
+         * not support issuing the subject cert, report the issuer certificate
          * and its depth (rather than the depth of the subject).
          */
         if (xs != xi || (ctx->param->flags & X509_V_FLAG_CHECK_SS_SIGNATURE)) {
             int issuer_depth = n + (xi == xs ? 0 : 1);
-            int ret = X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY;
+            int ret = X509_signing_allowed(xi, xs);
+            if (ret != X509_V_OK && !verify_cb_cert(ctx, xi, issuer_depth, ret))
+                return 0;
             if ((pkey = X509_get0_pubkey(xi)) == NULL) {
+                ret = X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY;
                 if (!verify_cb_cert(ctx, xi, issuer_depth, ret))
                     return 0;
             } else if (X509_verify_ex(xs, pkey, ctx->libctx, ctx->propq) <= 0) {
