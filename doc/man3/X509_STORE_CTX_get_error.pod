@@ -192,8 +192,9 @@ in the list of trusted certificates.
 =item B<X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 self-signed certificate in certificate chain>
 
-the certificate chain could be built up using the untrusted certificates but the
-(typically self-signed) root certificate could not be found in the trust store.
+the certificate chain could be built up using the untrusted certificates
+but the (typically self-signed) root certificate
+could not be found in the trust store.
 
 =item B<X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
 unable to get local issuer certificate>
