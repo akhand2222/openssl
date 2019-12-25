@@ -107,9 +107,8 @@ Unspecified error; should not happen.
 
 The issuer certificate of a locally looked up certificate could not be found.
 This normally means the list of trusted certificates is not complete.
-To enable termination of a chain by a certificate of an intermediate CA
-or by a trusted self-issued but not self-signed certificate
-the B<X509_V_FLAG_PARTIAL_CHAIN> flag may be set.
+To allow any certificate (not only a self-signed one) in the trust store
+to terminate the chain the B<X509_V_FLAG_PARTIAL_CHAIN> flag may be set.
 
 =item B<X509_V_ERR_UNABLE_TO_GET_CRL: unable to get certificate CRL>
 
