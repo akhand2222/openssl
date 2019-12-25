@@ -1762,8 +1762,6 @@ static int internal_verify(X509_STORE_CTX *ctx)
      * is allowed to reset errors (at its own peril).
      */
     while (n >= 0) {
-        EVP_PKEY *pkey;
-
         /*
          * Skip signature check for self-signed certificates unless explicitly
          * asked for because it does not add any security and just wastes time.
@@ -1772,8 +1770,10 @@ static int internal_verify(X509_STORE_CTX *ctx)
          * and its depth (rather than the depth of the subject).
          */
         if (xs != xi || (ctx->param->flags & X509_V_FLAG_CHECK_SS_SIGNATURE)) {
+            EVP_PKEY *pkey;
             int issuer_depth = n + (xi == xs ? 0 : 1);
             int ret = X509_signing_allowed(xi, xs);
+
             if (ret != X509_V_OK && !verify_cb_cert(ctx, xi, issuer_depth, ret))
                 return 0;
             if ((pkey = X509_get0_pubkey(xi)) == NULL) {
