@@ -348,7 +348,7 @@ static int setup_crldp(X509 *x)
 }
 
 /* Check that issuer public key algorithm matches subject signature algorithm */
-static int EVP_PKEY_check_sig_alg_match(EVP_PKEY *pkey, X509 *subject)
+static int check_sig_alg_match(const EVP_PKEY *pkey, const X509 *subject)
 {
     int pkey_nid;
 
@@ -522,7 +522,7 @@ int X509v3_cache_extensions(X509 *x, OPENSSL_CTX *libctx, const char *propq)
         x->ex_flags |= EXFLAG_SI; /* cert is self-issued */
         if (X509_check_akid(x, x->akid) == X509_V_OK /* SKID matches AKID */
             && /* .. and the signature alg matches the PUBKEY alg: */
-            EVP_PKEY_check_sig_alg_match(X509_get0_pubkey(x), x) == X509_V_OK)
+            check_sig_alg_match(X509_get0_pubkey(x), x) == X509_V_OK)
             x->ex_flags |= EXFLAG_SS; /* indicate self-signed */
     }
     x->altname = X509_get_ext_d2i(x, NID_subject_alt_name, &i, NULL);
@@ -861,7 +861,7 @@ int X509_likely_issued(X509 *issuer, X509 *subject, OPENSSL_CTX *libctx,
         return ret;
 
     /* check if the subject signature alg matches the issuer's PUBKEY alg */
-    return EVP_PKEY_check_sig_alg_match(X509_get0_pubkey(issuer), subject);
+    return check_sig_alg_match(X509_get0_pubkey(issuer), subject);
 }
 
 /*-
