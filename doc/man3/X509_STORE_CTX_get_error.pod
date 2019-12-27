@@ -192,9 +192,9 @@ in the list of trusted certificates.
 =item B<X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN:
 self-signed certificate in certificate chain>
 
-the certificate chain could be built up using the untrusted certificates
-but the (typically self-signed) root certificate
-could not be found in the trust store.
+The certificate chain could be built up using the untrusted certificates
+but no suitable trust anchor (which typically is a self-signed root certificate)
+could be found in the trust store.
 
 =item B<X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
 unable to get local issuer certificate>
@@ -206,8 +206,7 @@ of an untrusted certificate cannot be found.
 unable to verify the first certificate>
 
 No signatures could be verified because the chain contains only one certificate
-and it is not self-signed
-(nor self-issued in case the B<X509_V_FLAG_PARTIAL_CHAIN> flag is set).
+and it is not self-signed and the B<X509_V_FLAG_PARTIAL_CHAIN> flag is not set.
 
 =item B<X509_V_ERR_CERT_CHAIN_TOO_LONG: certificate chain too long>
 
@@ -406,7 +405,7 @@ CA signature digest algorithm too weak.
 
 =item B<X509_V_ERR_INVALID_CALL: invalid certificate verification context>
 
-invalid certificate verification context.
+Invalid certificate verification context.
 
 =item B<X509_V_ERR_STORE_LOOKUP: issuer certificate lookup error>
 

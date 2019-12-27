@@ -846,13 +846,13 @@ The relevant authority key identifier components of the current certificate
 (if present) must match the subject key identifier (if present)
 and issuer and serial number of the candidate issuer certificate.
 
-The lookup first consults the list of untrusted "intermediate" CA certificates
-and if no match is found there
-the remaining lookups are from the trusted certificates.
+The lookup first searches for issuer certificates in the trust store.
+If it does not find a match there it consults
+the list of untrusted "intermediate" CA certificates (if provided).
 The last certificate (which typically is of a root CA) is always looked up
 in the trusted certificate list; an exact match must be found there.
 
-The second step is to check every untrusted certificate's extensions
+The second step is to check the extensions of every untrusted certificate
 for consistency with the supplied purpose.
 If the B<-purpose> option is not included then no checks are done.
 The target or "leaf" certificate must have extensions compatible with the
@@ -868,14 +868,17 @@ a certificate with no trust settings is considered to be valid for all purposes.
 
 The fourth, and final, step is to check the validity of the certificate chain.
 The validity period is checked against the system time
-and the C<notBefore> and C<notAfter> dates in the certificate.
+and the C<notBefore> and C<notAfter> dates in each certificate.
 The B<-attime> flag may be used to specify a time other than "now."
 The certificate signatures are also checked at this point
-(except for the signature of the self-signed root certificate,
+(except for the signature of the self-signed "root CA" certificate,
 which is verified only if the B<-check_ss_sig> option is given).
 When verifying a certificate signature
 the keyUsage extension (if present) of the candidate issuer certificate
-is checked to permit the respective signing operation.
+is checked to permit the signing operation: digitalSignature
+for signing proxy certifiates and keyCertSign for signing other certificates.
+
+ the respective signing operation.
 
 If all operations complete successfully then certificate is considered
 valid. If any operation fails then the certificate is not valid.
@@ -967,9 +970,10 @@ This certificate may be self-issued or belong to an intermediate CA.
 
 =item B<-check_ss_sig>
 
-Verify the signature on the last certificate in a chain,
-which typically is a trusted self-signed root CA certificate.
-This check is disabled by default because it does not add any security.
+Verify the signature on the last certificate in a chain
+even when it is a self-signed (root CA) certificate.
+By default in this case the check is disabled
+because it does not add any security.
 
 =item B<-allow_proxy_certs>
 

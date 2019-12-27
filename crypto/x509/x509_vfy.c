@@ -355,7 +355,7 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
         if (ss < 0)
             return 0;
 
-        /* Special case: single self-signed certificate */
+        /* Special case: single (likely) self-signed certificate */
         if (x == issuer && sk_X509_num(ctx->chain) == 1)
             return 1;
         for (i = 0; i < sk_X509_num(ctx->chain); i++) {
@@ -1742,7 +1742,7 @@ static int internal_verify(X509_STORE_CTX *ctx)
         goto check_cert;
     }
 
-    if (ctx->check_issued(ctx, xi, xi))
+    if (ctx->check_issued(ctx, xi, xi)) /* the last cert appears self-signed */
         xs = xi;
     else {
         if (ctx->param->flags & X509_V_FLAG_PARTIAL_CHAIN) {

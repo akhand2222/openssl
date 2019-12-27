@@ -284,24 +284,24 @@ If B<X509_V_FLAG_USE_DELTAS> is set delta CRLs (if present) are used to
 determine certificate status. If not set deltas are ignored.
 
 B<X509_V_FLAG_CHECK_SS_SIGNATURE> requires verifying the signature of the last
-certificate in a chain, which typically is a trusted self-signed root CA
-certificate. By default this check is disabled because it does not
+certificate in a chain even when it is a self-signed (root CA) certificate.
+In this case the check is disabled by default because it does not
 add any additional security but in some cases applications might want to
 check the signature anyway. A side effect of not checking the root CA
 signature is that disabled or unsupported message digests on the root CA
 are not treated as fatal errors.
 
-When B<X509_V_FLAG_TRUSTED_FIRST> is set, construction of the certificate chain
-in L<X509_verify_cert(3)> will search the trust store for issuer certificates
+When B<X509_V_FLAG_TRUSTED_FIRST> is set, which is always the case since
+OpenSSL 1.1.0, construction of the certificate chain
+in L<X509_verify_cert(3)> searches the trust store for issuer certificates
 before searching the provided untrusted certificates.
 Local issuer certificates are often more likely to satisfy local security
 requirements and lead to a locally trusted root.
 This is especially important when some certificates in the trust store have
 explicit trust settings (see "TRUST SETTINGS" in L<openssl-x509(1)>).
-As of OpenSSL 1.1.0 this option is on by default.
 
-The B<X509_V_FLAG_NO_ALT_CHAINS> flag suppresses checking for alternative
-chains.
+The B<X509_V_FLAG_NO_ALT_CHAINS> flag could have been used before OpenSSL 1.1.0
+to suppress checking for alternative chains.
 By default, unless B<X509_V_FLAG_TRUSTED_FIRST> is set, when building a
 certificate chain, if the first certificate chain found is not trusted, then
 OpenSSL will attempt to replace untrusted certificates supplied by the peer
