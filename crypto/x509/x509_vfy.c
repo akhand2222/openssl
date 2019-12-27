@@ -1777,12 +1777,12 @@ static int internal_verify(X509_STORE_CTX *ctx)
             if (ret != X509_V_OK && !verify_cb_cert(ctx, xi, issuer_depth, ret))
                 return 0;
             if ((pkey = X509_get0_pubkey(xi)) == NULL) {
-                ret = X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY;
-                if (!verify_cb_cert(ctx, xi, issuer_depth, ret))
+                if (!verify_cb_cert(ctx, xi, issuer_depth,
+                                    X509_V_ERR_UNABLE_TO_DECODE_ISSUER_PUBLIC_KEY))
                     return 0;
             } else if (X509_verify_ex(xs, pkey, ctx->libctx, ctx->propq) <= 0) {
-                ret = X509_V_ERR_CERT_SIGNATURE_FAILURE;
-                if (!verify_cb_cert(ctx, xs, n, ret))
+                if (!verify_cb_cert(ctx, xs, n,
+                                    X509_V_ERR_CERT_SIGNATURE_FAILURE))
                     return 0;
             }
         }
