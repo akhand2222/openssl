@@ -111,22 +111,41 @@ static int null_callback(int ok, X509_STORE_CTX *e)
     return ok;
 }
 
-/*
- * Return 1 if a certificate is considered self-signed.
- * This does not verify self-signedness but relies on x509v3_cache_extensions()
- * matching issuer and subject names (i.e., the cert being self-issued) and any
- * present authority key identifier matching the subject key identifier, etc.
+/*-
+ * Return 1 if a certificate is (apparently) self-signed, 0 if not, -1 on error.
+ * This actually verifies self-signedness only if requested.
+ * Indirectly calls x509v3_cache_extensions() of v3_purp.c
+ * to match issuer and subject names (i.e., the cert being self-issued) and any
+ * present authority key identifier to match the subject key identifier etc.
  */
-static int apparently_self_signed(X509_STORE_CTX *ctx, X509 *x)
+static
+int x509_self_signed_ex(X509 *cert, int verify_signature, OPENSSL_CTX *libctx, const char *propq)
 {
-    if (!X509v3_cache_extensions(x, ctx->libctx, ctx->propq))
-        return -1;
+    EVP_PKEY *pkey;
 
-    if (x->ex_flags & EXFLAG_SS)
-        return 1;
-    else
+    if ((pkey = X509_get0_pubkey(cert)) == NULL) { /* handles cert == NULL */
+        X509err(0, X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY);
+        return -1;
+    }
+    if (!X509v3_cache_extensions(cert, libctx, propq))
+        return -1;
+    if ((cert->ex_flags & EXFLAG_SS) == 0)
         return 0;
+    if (!verify_signature)
+        return 1;
+    return X509_verify(cert, pkey);
 }
+/* wrapper for internal use */
+static int x509_self_signed(X509_STORE_CTX *ctx, X509 *x, int verify_signature)
+{
+    return x509_self_signed_ex(x, verify_signature, ctx->libctx, ctx->propq);
+}
+
+int X509_self_signed(X509 *cert, int verify_signature)
+{
+    return x509_self_signed_ex(cert, verify_signature, NULL, NULL);
+}
+
 
 /* Given a certificate try and find an exact match in the store */
 
@@ -340,7 +359,7 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
     int ss;
 
     if (x == issuer) {
-        ss = apparently_self_signed(ctx, x);
+        ss = x509_self_signed(ctx, x, 0);
         if (ss < 0)
             return 0;
         return ss;
@@ -351,7 +370,7 @@ static int check_issued(X509_STORE_CTX *ctx, X509 *x, X509 *issuer)
         int i;
         X509 *ch;
 
-        ss = apparently_self_signed(ctx, x);
+        ss = x509_self_signed(ctx, x, 0);
         if (ss < 0)
             return 0;
 
@@ -2968,7 +2987,7 @@ static int build_chain(X509_STORE_CTX *ctx)
         return 0;
     }
 
-    self_signed = apparently_self_signed(ctx, cert);
+    self_signed = x509_self_signed(ctx, cert, 0) == 1;
     if (self_signed < 0) {
         X509err(X509_F_BUILD_CHAIN, ERR_R_INTERNAL_ERROR);
         ctx->error = X509_V_ERR_UNSPECIFIED;
@@ -3147,12 +3166,7 @@ static int build_chain(X509_STORE_CTX *ctx)
                         search = 0;
                         continue;
                     }
-                    self_signed = apparently_self_signed(ctx, x);
-                    if (self_signed < 0) {
-                        X509err(X509_F_BUILD_CHAIN, ERR_R_INTERNAL_ERROR);
-                        ctx->error = X509_V_ERR_UNSPECIFIED;
-                        return 0;
-                    }
+                    self_signed = x509_self_signed(ctx, x, 0) == 1;
                 } else if (num == ctx->num_untrusted) {
                     /*
                      * We have a self-signed certificate that has the same
@@ -3265,13 +3279,7 @@ static int build_chain(X509_STORE_CTX *ctx)
 
             X509_up_ref(x = xtmp);
             ++ctx->num_untrusted;
-            self_signed = apparently_self_signed(ctx, xtmp);
-            if (self_signed < 0) {
-                X509err(X509_F_BUILD_CHAIN, ERR_R_INTERNAL_ERROR);
-                ctx->error = X509_V_ERR_UNSPECIFIED;
-                sk_X509_free(sktmp);
-                return 0;
-            }
+            self_signed = x509_self_signed(ctx, xtmp, 0) == 1;
 
             /*
              * Check for DANE-TA trust of the topmost untrusted certificate.

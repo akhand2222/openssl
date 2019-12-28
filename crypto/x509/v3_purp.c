@@ -370,7 +370,11 @@ static int check_sig_alg_match(const EVP_PKEY *pkey, const X509 *subject)
 #define ns_reject(x, usage) \
         (((x)->ex_flags & EXFLAG_NSCERT) && !((x)->ex_nscert & (usage)))
 
-/* this caches also further information, e.g., if the cert is self-issued */
+/*
+ * FIXME: x509v3_cache_extensions() needs to detect more failures and not
+ * set EXFLAG_SET when that happens.  Especially, if the failures are
+ * parse errors, rather than memory pressure!
+ */
 int X509v3_cache_extensions(X509 *x, OPENSSL_CTX *libctx, const char *propq)
 {
     BASIC_CONSTRAINTS *bs;
@@ -576,7 +580,7 @@ int X509v3_cache_extensions(X509 *x, OPENSSL_CTX *libctx, const char *propq)
  * 1 is a CA
  * 2 Only possible in older versions of openSSL when basicConstraints are absent
  *   new versions will not return this value. May be a CA
- * 3 basicConstraints absent but self signed V1.
+ * 3 basicConstraints absent but self-signed V1.
  * 4 basicConstraints absent but keyUsage present and keyCertSign asserted.
  * 5 Netscape specific CA Flags present
  */
