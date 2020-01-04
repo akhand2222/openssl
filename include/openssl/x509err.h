@@ -28,6 +28,7 @@ int ERR_load_X509_strings(void);
 #  define X509_F_ADD_CERT_DIR                              0
 #  define X509_F_BUILD_CHAIN                               0
 #  define X509_F_BY_FILE_CTRL                              0
+#  define X509_F_CACHE_OBJECTS                             0
 #  define X509_F_CHECK_NAME_CONSTRAINTS                    0
 #  define X509_F_CHECK_POLICY                              0
 #  define X509_F_COMMON_VERIFY_SM2                         0
@@ -126,6 +127,7 @@ int ERR_load_X509_strings(void);
 # define X509_R_PUBLIC_KEY_DECODE_ERROR                   125
 # define X509_R_PUBLIC_KEY_ENCODE_ERROR                   126
 # define X509_R_SHOULD_RETRY                              106
+# define X509_R_SIGNATURE_ALGORITHM_MISMATCH              140
 # define X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN        107
 # define X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY            108
 # define X509_R_UNKNOWN_KEY_TYPE                          117

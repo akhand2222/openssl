@@ -3471,6 +3471,7 @@ X509_R_NO_CRL_NUMBER:130:no crl number
 X509_R_PUBLIC_KEY_DECODE_ERROR:125:public key decode error
 X509_R_PUBLIC_KEY_ENCODE_ERROR:126:public key encode error
 X509_R_SHOULD_RETRY:106:should retry
+X509_R_SIGNATURE_ALGORITHM_MISMATCH:139:signature algorithm mismatch
 X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN:107:unable to find parameters in chain
 X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY:108:unable to get certs public key
 X509_R_UNKNOWN_KEY_TYPE:117:unknown key type

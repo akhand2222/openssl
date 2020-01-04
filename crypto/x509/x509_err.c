@@ -58,6 +58,8 @@ static const ERR_STRING_DATA X509_str_reasons[] = {
     {ERR_PACK(ERR_LIB_X509, 0, X509_R_PUBLIC_KEY_ENCODE_ERROR),
     "public key encode error"},
     {ERR_PACK(ERR_LIB_X509, 0, X509_R_SHOULD_RETRY), "should retry"},
+    {ERR_PACK(ERR_LIB_X509, 0, X509_R_SIGNATURE_ALGORITHM_MISMATCH),
+    "signature algorithm mismatch"},
     {ERR_PACK(ERR_LIB_X509, 0, X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN),
     "unable to find parameters in chain"},
     {ERR_PACK(ERR_LIB_X509, 0, X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY),
