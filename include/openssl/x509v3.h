@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2018 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1999-2020 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -342,21 +342,15 @@ struct ISSUING_DIST_POINT_st {
                         NULL, NULL, \
                         table}
 
-# define EXT_IA5STRING(nid) { nid, 0, ASN1_ITEM_ref(ASN1_IA5STRING), \
+# define EXT_ASN1_STRING(nid, asn1string) \
+                        { nid, 0, ASN1_ITEM_ref(asn1string), \
                         0,0,0,0, \
-                        (X509V3_EXT_I2S)i2s_ASN1_IA5STRING, \
-                        (X509V3_EXT_S2I)s2i_ASN1_IA5STRING, \
-                        0,0,0,0, \
-                        NULL}
-
-# define EXT_UTF8STRING(nid) { nid, 0, ASN1_ITEM_ref(ASN1_UTF8STRING), \
-                        0,0,0,0, \
-                        (X509V3_EXT_I2S)i2s_ASN1_UTF8STRING, \
-                        (X509V3_EXT_S2I)s2i_ASN1_UTF8STRING, \
+                        (X509V3_EXT_I2S)i2s_ASN1_STRING, \
+                        (X509V3_EXT_S2I)s2i_ASN1_STRING, \
                         0,0,0,0, \
                         NULL}
 
-# define EXT_END { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+# define EXT_IA5STRING(nid) EXT_ASN1_STRING(nid, ASN1_IA5STRING)
 
 /* X509_PURPOSE stuff */
 
@@ -489,14 +483,14 @@ ASN1_BIT_STRING *v2i_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
 STACK_OF(CONF_VALUE) *i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
                                           ASN1_BIT_STRING *bits,
                                           STACK_OF(CONF_VALUE) *extlist);
-char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5);
-ASN1_IA5STRING *s2i_ASN1_IA5STRING(X509V3_EXT_METHOD *method,
-                                   X509V3_CTX *ctx, const char *str);
 
-char *i2s_ASN1_UTF8STRING(X509V3_EXT_METHOD *method, ASN1_UTF8STRING *utf8);
-ASN1_UTF8STRING *s2i_ASN1_UTF8STRING(X509V3_EXT_METHOD *method,
-                                   X509V3_CTX *ctx, const char *str);
+char *i2s_ASN1_STRING(X509V3_EXT_METHOD *method, ASN1_STRING *ia5);
+ASN1_STRING *s2i_ASN1_STRING(X509V3_EXT_METHOD *method,
+                             X509V3_CTX *ctx, const char *str);
 
+/* for back-compatibility with IA5STRING methods */
+#define i2s_ASN1_IA5STRING i2s_ASN1_STRING;
+#define s2i_ASN1_IA5STRING s2i_ASN1_STRING;
 
 STACK_OF(CONF_VALUE) *i2v_GENERAL_NAME(X509V3_EXT_METHOD *method,
                                        GENERAL_NAME *gen,

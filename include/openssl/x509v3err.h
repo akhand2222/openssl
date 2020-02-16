@@ -44,7 +44,7 @@ int ERR_load_X509V3_strings(void);
 #  define X509V3_F_I2S_ASN1_ENUMERATED                     0
 #  define X509V3_F_I2S_ASN1_IA5STRING                      0
 #  define X509V3_F_I2S_ASN1_INTEGER                        0
-#  define X509V3_F_I2S_ASN1_UTF8STRING                     0
+#  define X509V3_F_I2S_ASN1_STRING                         0
 #  define X509V3_F_I2V_AUTHORITY_INFO_ACCESS               0
 #  define X509V3_F_LEVEL_ADD_NODE                          0
 #  define X509V3_F_NOTICE_SECTION                          0
@@ -59,7 +59,7 @@ int ERR_load_X509V3_strings(void);
 #  define X509V3_F_S2I_ASN1_IA5STRING                      0
 #  define X509V3_F_S2I_ASN1_INTEGER                        0
 #  define X509V3_F_S2I_ASN1_OCTET_STRING                   0
-#  define X509V3_F_S2I_ASN1_UTF8STRING                     0
+#  define X509V3_F_S2I_ASN1_STRING                         0
 #  define X509V3_F_S2I_SKEY_ID                             0
 #  define X509V3_F_SET_DIST_POINT_NAME                     0
 #  define X509V3_F_SXNET_ADD_ID_ASC                        0

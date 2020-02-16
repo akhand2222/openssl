@@ -325,7 +325,7 @@ BIO_ctrl_reset_read_request             330	3_0_0	EXIST::FUNCTION:
 CRYPTO_ccm128_tag                       331	3_0_0	EXIST::FUNCTION:
 BIO_new_dgram_sctp                      332	3_0_0	EXIST::FUNCTION:DGRAM,SCTP
 d2i_RSAPrivateKey_fp                    333	3_0_0	EXIST::FUNCTION:RSA,STDIO
-s2i_ASN1_IA5STRING                      334	3_0_0	EXIST::FUNCTION:
+s2i_ASN1_STRING                         334	3_0_0	EXIST::FUNCTION:
 UI_get_ex_data                          335	3_0_0	EXIST::FUNCTION:
 EVP_EncryptUpdate                       336	3_0_0	EXIST::FUNCTION:
 SRP_create_verifier                     337	3_0_0	EXIST::FUNCTION:SRP
@@ -3225,7 +3225,7 @@ PBEPARAM_free                           3291	3_0_0	EXIST::FUNCTION:
 NETSCAPE_SPKI_set_pubkey                3292	3_0_0	EXIST::FUNCTION:
 EVP_sha512                              3293	3_0_0	EXIST::FUNCTION:
 X509_CRL_match                          3294	3_0_0	EXIST::FUNCTION:
-i2s_ASN1_IA5STRING                      3295	3_0_0	EXIST::FUNCTION:
+i2s_ASN1_STRING                         3295	3_0_0	EXIST::FUNCTION:
 EC_KEY_get_default_method               3296	3_0_0	EXIST::FUNCTION:EC
 PKCS8_decrypt                           3297	3_0_0	EXIST::FUNCTION:
 EVP_PKEY_CTX_get_data                   3298	3_0_0	EXIST::FUNCTION:
@@ -4928,5 +4928,3 @@ OSSL_HTTP_get_asn1                      ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_post_asn1                     ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_transfer                      ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_proxy_connect                 ?	3_0_0	EXIST::FUNCTION:SOCK
-i2s_ASN1_UTF8STRING                     ?	3_0_0	EXIST::FUNCTION:
-s2i_ASN1_UTF8STRING                     ?	3_0_0	EXIST::FUNCTION:
