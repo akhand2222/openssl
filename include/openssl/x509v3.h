@@ -349,6 +349,13 @@ struct ISSUING_DIST_POINT_st {
                         0,0,0,0, \
                         NULL}
 
+# define EXT_UTF8STRING(nid) { nid, 0, ASN1_ITEM_ref(ASN1_UTF8STRING), \
+                        0,0,0,0, \
+                        (X509V3_EXT_I2S)i2s_ASN1_UTF8STRING, \
+                        (X509V3_EXT_S2I)s2i_ASN1_UTF8STRING, \
+                        0,0,0,0, \
+                        NULL}
+
 # define EXT_END { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 /* X509_PURPOSE stuff */
@@ -485,6 +492,11 @@ STACK_OF(CONF_VALUE) *i2v_ASN1_BIT_STRING(X509V3_EXT_METHOD *method,
 char *i2s_ASN1_IA5STRING(X509V3_EXT_METHOD *method, ASN1_IA5STRING *ia5);
 ASN1_IA5STRING *s2i_ASN1_IA5STRING(X509V3_EXT_METHOD *method,
                                    X509V3_CTX *ctx, const char *str);
+
+char *i2s_ASN1_UTF8STRING(X509V3_EXT_METHOD *method, ASN1_UTF8STRING *utf8);
+ASN1_UTF8STRING *s2i_ASN1_UTF8STRING(X509V3_EXT_METHOD *method,
+                                   X509V3_CTX *ctx, const char *str);
+
 
 STACK_OF(CONF_VALUE) *i2v_GENERAL_NAME(X509V3_EXT_METHOD *method,
                                        GENERAL_NAME *gen,

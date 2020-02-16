@@ -4928,3 +4928,5 @@ OSSL_HTTP_get_asn1                      ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_post_asn1                     ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_transfer                      ?	3_0_0	EXIST::FUNCTION:SOCK
 OSSL_HTTP_proxy_connect                 ?	3_0_0	EXIST::FUNCTION:SOCK
+i2s_ASN1_UTF8STRING                     ?	3_0_0	EXIST::FUNCTION:
+s2i_ASN1_UTF8STRING                     ?	3_0_0	EXIST::FUNCTION:
