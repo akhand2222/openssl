@@ -108,7 +108,6 @@ int ERR_load_X509_strings(void);
 # define X509_R_CRL_VERIFY_FAILURE                        131
 # define X509_R_IDP_MISMATCH                              128
 # define X509_R_INVALID_ATTRIBUTES                        138
-# define X509_R_INVALID_BIT_STRING_BITS_LEFT              140
 # define X509_R_INVALID_DIRECTORY                         113
 # define X509_R_INVALID_FIELD_NAME                        119
 # define X509_R_INVALID_TRUST                             123
@@ -132,14 +131,11 @@ int ERR_load_X509_strings(void);
 # define X509_R_UNABLE_TO_FIND_PARAMETERS_IN_CHAIN        107
 # define X509_R_UNABLE_TO_GET_CERTS_PUBLIC_KEY            108
 # define X509_R_UNKNOWN_KEY_TYPE                          117
-# define X509_R_UNKNOWN_MESSAGE_DIGEST_ALGORITHM          141
 # define X509_R_UNKNOWN_NID                               109
 # define X509_R_UNKNOWN_PURPOSE_ID                        121
-# define X509_R_UNKNOWN_SIGNATURE_ALGORITHM               142
 # define X509_R_UNKNOWN_TRUST_ID                          120
 # define X509_R_UNSUPPORTED_ALGORITHM                     111
 # define X509_R_WRONG_LOOKUP_TYPE                         112
-# define X509_R_WRONG_PUBLIC_KEY_TYPE                     143
 # define X509_R_WRONG_TYPE                                122
 
 #endif
