@@ -372,7 +372,7 @@ ok(verify("root-cert-rsa2", "sslserver", ["root-cert-rsa2"], [], "-check_ss_sig"
        "accept trusted self-signed EE cert excluding key usage keyCertSign");
 
 SKIP: {
-    skip "Ed25519 is not supported by this OpenSSL build", 1
+    skip "Ed25519 is not supported by this OpenSSL build", 5
 	      if disabled("ec");
 
     # ED25519 certificate from draft-ietf-curdle-pkix-04
