@@ -22,15 +22,6 @@
 DEFINE_STACK_OF(GENERAL_NAMES)
 DEFINE_STACK_OF(CMS_SignerInfo)
 
-/*
- * Returns < 0 if attribute is not found, 1 if found, or 
- * -1 on attribute parsing failure.
- */
-static int cms_signerinfo_get_signing_cert_v2(CMS_SignerInfo *si,
-                                              ESS_SIGNING_CERT_V2 **psc);
-static int cms_signerinfo_get_signing_cert(CMS_SignerInfo *si,
-                                           ESS_SIGNING_CERT **psc);
-
 IMPLEMENT_ASN1_FUNCTIONS(CMS_ReceiptRequest)
 
 /* ESS services */
