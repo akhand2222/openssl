@@ -71,7 +71,7 @@ int X509_verify_ex(X509 *a, EVP_PKEY *r, OPENSSL_CTX *libctx, const char *propq)
     ASN1_OCTET_STRING *id = NULL;
 
     if (X509_ALGOR_cmp(&a->sig_alg, &a->cert_info.signature) != 0) {
-        X509err(X509_F_X509_VERIFY, X509_R_SIGNATURE_ALGORITHM_MISMATCH);
+        X509err(X509_F_X509_VERIFY_EX, X509_R_SIGNATURE_ALGORITHM_MISMATCH);
         return -1;
     }
 
