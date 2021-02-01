@@ -24,7 +24,6 @@ addons:
 
 os:
     - linux
-    - osx
 
 compiler:
     - clang
@@ -48,17 +47,42 @@ matrix:
           compiler: gcc-5
           env: CONFIG_OPTS="--strict-warnings" COMMENT="Move to the BORINGTEST build when interoperable"
         - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
+          addons:
+              apt:
+                  packages:
+                      - gcc-5
+                      - g++-5
+                  sources:
+                      - ubuntu-toolchain-r-test
+          compiler: gcc-5
+          env: CONFIG_OPTS="--strict-warnings" COMMENT="Move to the BORINGTEST build when interoperable"
+        - os: linux
           compiler: clang-3.9
           env: CONFIG_OPTS="--strict-warnings no-deprecated" BUILDONLY="yes"
+        - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
+          compiler: clang-3.9
+          env: CONFIG_OPTS="--strict-warnings no-deprecated" BUILDONLY="yes"
+
         - os: linux
           addons:
               apt:
                   packages:
-                      - binutils-mingw-w64
-                      - gcc-mingw-w64
-          compiler: i686-w64-mingw32-gcc
-          env: CONFIG_OPTS="no-stdio" BUILDONLY="yes"
+                      - gcc-5
+                      - g++-5
+                  sources:
+                      - ubuntu-toolchain-r-test
+          compiler: gcc-5
+          env:  EXTENDED_TEST="yes" CONFIG_OPTS="--debug --coverage no-asm enable-rc5 enable-md2 enable-ec_nistp_64_gcc_128 enable-ssl3 enable-ssl3-method enable-nextprotoneg enable-weak-ssl-ciphers no-shared -DPEDANTIC -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION" COVERALLS="yes" BORINGSSL_TESTS="yes" CXX="g++-5"
         - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
           addons:
               apt:
                   packages:
@@ -79,12 +103,43 @@ matrix:
           compiler: gcc-5
           env:  EXTENDED_TEST="yes" CONFIG_OPTS="--debug enable-ssl3 enable-ssl3-method enable-weak-ssl-ciphers enable-external-tests" BORINGSSL_TESTS="yes" CXX="g++-5" TESTS=95
         - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
+          addons:
+              apt:
+                  packages:
+                      - gcc-5
+                      - g++-5
+                  sources:
+                      - ubuntu-toolchain-r-test
+          compiler: gcc-5
+          env:  EXTENDED_TEST="yes" CONFIG_OPTS="--debug enable-ssl3 enable-ssl3-method enable-weak-ssl-ciphers enable-external-tests" BORINGSSL_TESTS="yes" CXX="g++-5" TESTS=95
+        - os: linux
+          compiler: clang-3.9
+          env: EXTENDED_TEST="yes" CONFIG_OPTS="enable-msan"
+        - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
           compiler: clang-3.9
           env: EXTENDED_TEST="yes" CONFIG_OPTS="enable-msan"
         - os: linux
           compiler: clang-3.9
           env:  EXTENDED_TEST="yes" CONFIG_OPTS="no-asm enable-ubsan enable-rc5 enable-md2 enable-ssl3 enable-ssl3-method enable-nextprotoneg -fno-sanitize=alignment no-shared -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
         - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
+          compiler: clang-3.9
+          env:  EXTENDED_TEST="yes" CONFIG_OPTS="no-asm enable-ubsan enable-rc5 enable-md2 enable-ssl3 enable-ssl3-method enable-nextprotoneg -fno-sanitize=alignment no-shared -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
+        - os: linux
+          compiler: clang-3.9
+          env: EXTENDED_TEST="yes" CONFIG_OPTS="no-asm enable-asan enable-rc5 enable-md2 no-shared -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
+        - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
           compiler: clang-3.9
           env: EXTENDED_TEST="yes" CONFIG_OPTS="no-asm enable-asan enable-rc5 enable-md2 no-shared -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
         - os: linux
@@ -98,26 +153,22 @@ matrix:
           compiler: gcc-5
           env: EXTENDED_TEST="yes" CONFIG_OPTS="--debug no-asm enable-ubsan enable-rc5 enable-md2 -DPEDANTIC" OPENSSL_TEST_RAND_ORDER=0
         - os: linux
+          arch: arm64-graviton2
+          virt: lxd
+          group: edge
           addons:
               apt:
                   packages:
-                      - binutils-mingw-w64
-                      - gcc-mingw-w64
-          compiler: i686-w64-mingw32-gcc
-          env: EXTENDED_TEST="yes" CONFIG_OPTS="no-pic"
-        - os: linux
-          addons:
-              apt:
-                  packages:
-                      - binutils-mingw-w64
-                      - gcc-mingw-w64
-          compiler: x86_64-w64-mingw32-gcc
-          env: EXTENDED_TEST="yes" CONFIG_OPTS="no-pic"
+                      - gcc-5
+                      - g++-5
+                  sources:
+                      - ubuntu-toolchain-r-test
+          compiler: gcc-5
+          env: EXTENDED_TEST="yes" CONFIG_OPTS="--debug no-asm enable-ubsan enable-rc5 enable-md2 -DPEDANTIC" OPENSSL_TEST_RAND_ORDER=0
+
     exclude:
         - os: linux
           compiler: clang
-        - os: osx
-          compiler: gcc
 
 before_script:
     - env
